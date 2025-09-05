@@ -1,0 +1,78 @@
+{
+  "profile": {
+    "name": "Raktim Kalita",
+    "title": "Passionate about building scalable ML pipelines, cloud-native infra, and automation"
+  },
+  "projects": [
+    {
+      "name": "ezyml",
+      "description": "A lightweight Python library and CLI tool that automates the most tedious parts of your ML pipeline — so you can focus on what matters. Build classifiers, regressors, or explore data with ease.",
+      "tech_stack": ["Python", "PyPI", "Scikit-learn"],
+      "github": "https://github.com/Rktim/ezyml",
+      "demo": "https://pypi.org/project/ezyml/"
+    },
+    {
+      "name": "filewitch",
+      "description": "A versatile Python command-line tool that empowers you to convert and merge files between various formats effortlessly, including CSV, Excel, Word, PDF, and text files.",
+      "tech_stack": ["Python", "PyPI", "CLI"],
+      "github": "https://github.com/Rktim/filewitch",
+      "demo": "https://pypi.org/project/filewitch/"
+    },
+    {
+      "name": "GraphLit",
+      "description": "Your smart data visualization companion. Upload a CSV/Excel dataset and instantly generate beautiful, interactive charts & dashboards — no coding required. Quickly explore datasets, detect insights, and build dashboards in seconds.",
+      "tech_stack": ["Python", "Streamlit", "Plotly", "Pandas"],
+      "github": "https://github.com/Rktim/Graphlit",
+      "demo": "https://graphlit1.streamlit.app/"
+    },
+    {
+      "name": "TELEmate - F1 Tyre Degradation Simulator",
+      "description": "A comprehensive tyre degradation simulation tool using the FastF1 API to analyze tyre performance under different track and racing conditions for Formula 1.",
+      "tech_stack": ["Python", "Streamlit", "FastF1", "Plotly", "Pandas"],
+      "github": "https://github.com/Rktim/TELEmate",
+      "demo": "https://telemate.streamlit.app/"
+    },
+    {
+      "name": "YouTube RAGbot",
+      "description": "Your AI-powered video analysis companion. Dive into any YouTube video, pull out its transcript, and chat with an AI that knows exactly what’s happening on screen. Perfect for researchers, students, or anyone who wants answers without endless scrubbing.",
+      "tech_stack": ["Python", "Streamlit", "LangChain", "FAISS", "OpenAI"],
+      "github": "https://github.com/Rktim/YoutubeRAGbot",
+      "demo": "https://youtuberagbot.streamlit.app/"
+    },
+    {
+      "name": "YouTube Transcriptractor",
+      "description": "A powerful web app designed to help you fetch subtitles/transcripts from any YouTube video with ease. Whether you're a student, a content creator, or just someone who loves collecting transcripts — this app gets the job done with one click.",
+      "tech_stack": ["Python", "Streamlit", "Whisper", "Transformers"],
+      "github": "https://github.com/Rktim/YuOtube_Transcriptor",
+      "demo": "https://yuotubetranscriptor.streamlit.app/"
+    },
+    {
+      "name": "Medical Data Categorization Tool",
+      "description": "This project is designed to process medical datasets, specifically focusing on analyzing patient haemoglobin and platelet counts. It categorizes patients based on predefined thresholds, facilitating better understanding and visualization of patient health metrics.",
+      "tech_stack": ["Python", "Streamlit", "Scikit-learn", "Pandas", "Plotly"],
+      "github": "https://github.com/Rktim/med",
+      "demo": "https://medidata.streamlit.app/"
+    },
+    {
+      "name": "HuggingFace Search",
+      "description": "A streamlined web application for searching and discovering models on the Hugging Face Hub.",
+      "tech_stack": ["Python", "Streamlit", "Hugging Face Hub", "API"],
+      "github": "https://github.com/Rktim/HuggingFaceSearch",
+      "demo": "https://huggingfacesearch.streamlit.app/"
+    },
+    {
+      "name": "Tokenizer Playground",
+      "description": "A simple playground to test out different tokenizers.",
+      "tech_stack": ["Python", "Streamlit", "Transformers", "Tokenizers"],
+      "github": "https://github.com/Rktim/token_playground",
+      "demo": "https://tokenplayground.streamlit.app/"
+    },
+    {
+      "name": "Image Background Remover & Format Converter",
+      "description": "A simple yet powerful tool to remove image backgrounds using AI and convert images into WEBP, JPEG, or PNG formats. Built with Streamlit and Rembg for a seamless experience.",
+      "tech_stack": ["Python", "Streamlit", "Pillow", "rembg"],
+      "github": "https://github.com/Rktim/Image_BG_format",
+      "demo": "https://imagebgformat.streamlit.app/"
+    }
+  ]
+}

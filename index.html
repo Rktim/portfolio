@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Raktim Kalita - Terminal Portfolio</title>
+  <style>
+    :root { --background:#0d0d0d; --foreground:#00ff00; }
+    body {
+      background-color: var(--background);
+      color: var(--foreground);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 16px; line-height: 1.4; margin: 0; padding: 1rem;
+      overflow-y: scroll; position: relative;
+    }
+    #terminal-body { padding-bottom: 50px; }
+    #profile-picture {
+      position: absolute; top: 1rem; right: 1rem; width: 150px; height: 150px;
+      border-radius: 50%; border: 3px solid var(--foreground); display: none;
+      z-index: 10; box-shadow: 0 0 15px var(--foreground);
+    }
+    @media (max-width: 768px){ #profile-picture{ display: none; } }
+    pre { white-space: pre-wrap; word-wrap: break-word; margin: 0; padding: 0; }
+    .scanline{
+      position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none;
+      background: linear-gradient(to bottom, rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%);
+      background-size: 100% 4px; animation: scan 10s linear infinite; z-index:1;
+    }
+    .flicker{ animation: flicker 0.1s infinite; }
+    @keyframes scan { from{background-position:0 0;} to{background-position:0 -200px;} }
+    @keyframes flicker { 0%,100%{opacity:1;} 50%{opacity:.95;} }
+    #input-line{ display:flex; align-items:center; }
+    #prompt{ margin-right:.5rem; }
+    #command-input{
+      background: transparent; border:none; color:var(--foreground);
+      font-family: inherit; font-size: inherit; width:100%; outline:none;
+    }
+    .cursor{
+      display:inline-block; background-color:var(--foreground);
+      width:10px; height:1.2em; margin-left:5px; animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { from,to{background-color: transparent} 50%{background-color:var(--foreground);} }
+    .hidden{ display:none !important; }
+    a{ color:var(--foreground); text-decoration: underline; }
+    a:hover{ background-color:var(--foreground); color:var(--background); }
+  </style>
+</head>
+
+<body>
+  <div class="scanline"></div>
+  <div class="flicker"></div>
+
+  <img id="profile-picture" src="pf.png" alt="Profile Picture" />
+
+  <div id="terminal-body"></div>
+
+  <div id="input-line" class="hidden">
+    <span id="prompt"></span>
+    <input type="text" id="command-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+    <div class="cursor"></div>
+  </div>
+
+  <script>
+    // --- CONFIG --- //
+    const portfolioConfig = {
+      motd: `
+   /\\_/\\
+  ( o.o )
+   > ^ <
+Welcome to My Portfolio.
+Hi, myself Raktim Kalita , I am BTech Studnet in AI& ML . System online.
+Type 'help' for a list of commands.`,
+
+      about: `Hi, I'm Raktim Kalita, a B.Tech. student in AI & ML, passionate about
+building scalable ML pipelines, cloud-native infra, and automation.
+I work on Agentic AI, RAG, Small Language Models (SLMs), and enjoy exploring new tech.`,
+
+      skills: `My Tech Stack:
+- Languages: Python, R, PowerShell
+- ML/DL: Scikit-learn, Keras, TensorFlow, PyTorch, Pandas, NumPy, Matplotlib, Plotly, OpenCV
+- MLOps & Data: MLflow, Docker, WandB, LangChain, Ollama, HuggingFace
+- Web & API: FastAPI, Streamlit, Apache Spark
+- Databases & Cloud: Google Cloud, Heroku, SQLite, MySQL
+- Tools: Git, GitHub, Postman, Markdown, WordPress, Figma`,
+
+      contact: `<a href="mailto:raktimkalita.ai@gmail.com">Email</a>&nbsp;&nbsp;&nbsp;<a href="https://github.com/Rktim" target="_blank">GitHub</a>&nbsp;&nbsp;&nbsp;<a href="https://www.linkedin.com/in/raktim-kalita-569abb2bb/" target="_blank">LinkedIn</a>`
+    };
+
+    const bootSequence = [
+      'Booting RK-DOS v1.0...', 'Memory check: 640KB OK',
+      'Initializing hardware...', 'System ready.', ''
+    ];
+
+    // --- ELEMENTS --- //
+    const terminalBody = document.getElementById('terminal-body');
+    const inputLine = document.getElementById('input-line');
+    const promptElement = document.getElementById('prompt');
+    const commandInput = document.getElementById('command-input');
+
+    // --- STATE --- //
+    let state = 'booting';
+    let username = 'guest';
+    let currentPath = '~';
+    let commandHistory = [];
+    let historyIndex = -1;
+
+    // --- HELPERS --- //
+    const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+    const scrollToEnd = () => { window.scrollTo(0, document.body.scrollHeight); };
+    const escapeHtml = (unsafe) =>
+      unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    const renderLine = (html, delay = 20) => {
+      const p = document.createElement('pre');
+      p.innerHTML = html;
+      terminalBody.appendChild(p);
+      scrollToEnd();
+      return sleep(delay);
+    };
+
+    const updatePrompt = () => {
+      if (promptElement) {
+        promptElement.innerHTML = `${username}@rktim-dev:${currentPath}$`;
+      }
+    };
+
+    // --- FILE SYSTEM --- //
+    let fileSystem = { '~': { type: 'dir', children: {} } };
+
+    const createProjectFiles = (projects) => {
+      const files = {};
+      projects.forEach(p => {
+        const filename = p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.txt';
+        files[filename] = {
+          type: 'file',
+          content: `Project: ${p.name}\n\nDescription: ${p.description}\n\nStack: ${p.tech_stack.join(', ')}\n\n<a href="${p.github}" target="_blank">GitHub</a>\n<a href="${p.demo}" target="_blank">Demo</a>`
+        };
+      });
+      return files;
+    };
+
+    async function loadProjects() {
+      const response = await fetch("projects.json");
+      const data = await response.json();
+
+      // Build root
+      fileSystem = {
+        '~': {
+          type: 'dir',
+          children: {
+            'about.txt':   { type: 'file', content: portfolioConfig.about   },
+            'skills.txt':  { type: 'file', content: portfolioConfig.skills  },
+            'contact.txt': { type: 'file', content: portfolioConfig.contact },
+            'projects':    { type: 'dir', children: createProjectFiles(data.projects) }
+          }
+        }
+      };
+    }
+
+    const resolvePath = (path) => {
+      let current = fileSystem['~'];
+      if (path === '~') return current;
+      const parts = path.replace(/^~\//, '').split('/').filter(Boolean);
+      for (const part of parts) {
+        if (current.type === 'dir' && current.children[part]) {
+          current = current.children[part];
+        } else { return null; }
+      }
+      return current;
+    };
+
+    // --- COMMANDS --- //
+    const commands = {
+      help: async () => {
+        await renderLine(`Available commands:
+  help      - Show this help
+  ls [dir]  - List files
+  cd [dir]  - Change directory
+  cat [f]   - Show file content
+  resume    - Open resume
+  whoami    - Current user
+  uname -a  - System info
+  clear     - Clear screen
+  sudo      - Easter egg`);
+      },
+
+      ls: async (args=[]) => {
+        const arg = args[0] || '';
+        let targetPath;
+        if (!arg) targetPath = currentPath;
+        else if (arg === '~') targetPath = '~';
+        else if (arg === '.') targetPath = currentPath;
+        else if (arg === '..') targetPath = '~';
+        else if (arg.startsWith('~/')) targetPath = arg;
+        else targetPath = currentPath === '~' ? `~/${arg}` : `${currentPath}/${arg}`;
+
+        const node = resolvePath(targetPath);
+        if (!node) { await renderLine(`ls: cannot access '${targetPath}'`); return; }
+        if (node.type === 'file') { await renderLine(arg||targetPath); return; }
+        const names = Object.keys(node.children||{});
+        await renderLine(names.map(n => node.children[n].type==='dir'?`${n}/`:n).join('  ')||'(empty)');
+      },
+
+      cd: async (args=[]) => {
+        const dir = args[0];
+        if (!dir) { currentPath='~'; updatePrompt(); return; }
+        if (dir==='..') { currentPath='~'; updatePrompt(); return; }
+        const base = resolvePath(currentPath);
+        if (base && base.children[dir] && base.children[dir].type==='dir') {
+          currentPath = currentPath==='~' ? `~/${dir}` : `${currentPath}/${dir}`;
+          updatePrompt();
+        } else { await renderLine(`cd: ${dir}: Not a directory`); }
+      },
+
+      cat: async (args=[]) => {
+        const file = args[0]; if (!file){await renderLine(`cat: missing operand`); return;}
+        const base = resolvePath(currentPath);
+        if (base && base.children[file] && base.children[file].type==='file'){
+          await renderLine(base.children[file].content);
+        } else await renderLine(`cat: ${file}: No such file`);
+      },
+
+      whoami: async () => await renderLine(username),
+      'uname -a': async () => await renderLine('Linux rktim-dev x86_64 GNU/Linux'),
+      clear: async () => terminalBody.innerHTML='',
+      sudo: async () => { await renderLine(`[sudo] password for ${username}:`); await sleep(800); await renderLine(`${username} is not in the sudoers file.`); },
+      resume: async () => { await renderLine('Opening resume...'); window.open('raktimAI.pdf','_blank'); }
+    };
+
+    const processInput = async (input) => {
+      if (state==='login'){ username=input.trim()||'guest'; await renderLine(portfolioConfig.motd); inputLine.classList.remove('hidden'); document.getElementById('profile-picture').style.display='block'; state='active'; updatePrompt(); commandInput.value=''; commandInput.focus(); return; }
+      const parts=input.trim().split(' ').filter(Boolean); if(!parts.length)return;
+      const command=parts[0], args=parts.slice(1);
+      commandHistory.unshift(input); if(commandHistory.length>50) commandHistory.pop(); historyIndex=-1;
+      const line=document.createElement('div'); line.innerHTML=`<span id="prompt">${username}@rktim-dev:${currentPath}$</span><span>${escapeHtml(input)}</span>`; terminalBody.appendChild(line);
+      if(commands[command]) await commands[command](args); else if(commands[input.trim()]) await commands[input.trim()](args); else await renderLine(`-bash: ${command}: not found`);
+    };
+
+    const addCommandInputListener = () => {
+      commandInput.addEventListener('keydown', async (e)=>{
+        if(e.key==='Enter'){e.preventDefault(); const input=commandInput.value; commandInput.value=''; await processInput(input); scrollToEnd();}
+        else if(e.key==='ArrowUp'){e.preventDefault(); if(historyIndex<commandHistory.length-1){historyIndex++; commandInput.value=commandHistory[historyIndex];}}
+        else if(e.key==='ArrowDown'){e.preventDefault(); if(historyIndex>0){historyIndex--; commandInput.value=commandHistory[historyIndex];} else {historyIndex=-1; commandInput.value='';}}
+      });
+    };
+
+    async function initBoot(){
+      await loadProjects();
+      for(const line of bootSequence){ await renderLine(line,100); }
+      await renderLine('rktim-dev login: ');
+      inputLine.classList.remove('hidden'); commandInput.focus(); state='login';
+    }
+
+    document.addEventListener('DOMContentLoaded', async ()=>{
+      addCommandInputListener(); await initBoot();
+      document.body.addEventListener('click',()=>commandInput.focus());
+    });
+  </script>
+</body>
+</html>
