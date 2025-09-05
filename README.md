@@ -55,4 +55,3 @@ sudo
 
 ---
 
-💡 *Tip:* Try typing random Linux commands… you might find some Easter eggs 🐧
