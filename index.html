@@ -228,7 +228,7 @@ I work on Agentic AI, RAG, Small Language Models (SLMs), and enjoy exploring new
       'uname -a': async () => await renderLine('Linux rktim-dev x86_64 GNU/Linux'),
       clear: async () => terminalBody.innerHTML='',
       sudo: async () => { await renderLine(`[sudo] password for ${username}:`); await sleep(800); await renderLine(`${username} is not in the sudoers file.`); },
-      resume: async () => { await renderLine('Opening resume...'); window.open('https://drive.google.com/file/d/1j8M_vUKT0Y60vw55u99eS5aJ0PG88wh7/view?usp=drive_link','_blank'); }
+      echo resume: async () => { await renderLine('Opening resume...'); window.open('https://drive.google.com/file/d/1j8M_vUKT0Y60vw55u99eS5aJ0PG88wh7/view?usp=drive_link','_blank'); }
     };
 
     const processInput = async (input) => {
