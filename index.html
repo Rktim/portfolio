@@ -79,7 +79,7 @@ I work on Agentic AI, RAG, Small Language Models (SLMs), and enjoy exploring new
       skills: `My Tech Stack:
 - Languages: Python, R, PowerShell
 - ML/DL: Scikit-learn, Keras, TensorFlow, PyTorch, Pandas, NumPy, Matplotlib, Plotly, OpenCV
-- MLOps & Data: MLflow, Docker, WandB, LangChain, Ollama, HuggingFace
+- MLOps & Data:  Docker, WandB, LangChain, Ollama, HuggingFace
 - Web & API: FastAPI, Streamlit, Apache Spark
 - Databases & Cloud: Google Cloud, Heroku, SQLite, MySQL
 - Tools: Git, GitHub, Postman, Markdown, WordPress, Figma`,
@@ -154,6 +154,7 @@ I work on Agentic AI, RAG, Small Language Models (SLMs), and enjoy exploring new
             'about.txt':   { type: 'file', content: portfolioConfig.about   },
             'skills.txt':  { type: 'file', content: portfolioConfig.skills  },
             'contact.txt': { type: 'file', content: portfolioConfig.contact },
+            'resume.txt':  { type: 'file', content: `Resume Link:\n<a href="https://drive.google.com/file/d/1j8M_vUKT0Y60vw55u99eS5aJ0PG88wh7/view?usp=drive_link" target="_blank">Open Resume</a>` },
             'projects':    { type: 'dir', children: createProjectFiles(data.projects) }
           }
         }
@@ -227,7 +228,7 @@ I work on Agentic AI, RAG, Small Language Models (SLMs), and enjoy exploring new
       'uname -a': async () => await renderLine('Linux rktim-dev x86_64 GNU/Linux'),
       clear: async () => terminalBody.innerHTML='',
       sudo: async () => { await renderLine(`[sudo] password for ${username}:`); await sleep(800); await renderLine(`${username} is not in the sudoers file.`); },
-      resume: async () => { await renderLine('Opening resume...'); window.open('raktimAI.pdf','_blank'); }
+      resume: async () => { await renderLine('Opening resume...'); window.open('https://drive.google.com/file/d/1j8M_vUKT0Y60vw55u99eS5aJ0PG88wh7/view?usp=drive_link','_blank'); }
     };
 
     const processInput = async (input) => {
